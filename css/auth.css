@@ -1,0 +1,109 @@
+/* ==========================================================================
+   INVENZA — Auth pages (Login, Sign Up, Reset Password) + Splash Screen
+   ========================================================================== */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  padding: 24px;
+}
+
+.auth-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  padding: 40px 36px;
+  animation: card-in 0.35s ease;
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-brand {
+  text-align: center;
+  margin-bottom: 26px;
+}
+.auth-brand img {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border-radius: 14px;
+}
+.auth-brand .brand-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.auth-title { text-align: center; margin-bottom: 26px; }
+.auth-title h1 { font-size: 20px; margin: 0 0 6px; }
+.auth-title p { margin: 0; color: var(--color-text-muted); font-size: 14px; }
+
+.auth-alert {
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  margin-bottom: 18px;
+  display: none;
+}
+.auth-alert.show { display: block; }
+.auth-alert.error { background: var(--color-danger-light); color: var(--color-danger); }
+.auth-alert.success { background: var(--color-success-light); color: var(--color-success); }
+
+.auth-links {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 14px;
+}
+.auth-links .forgot-link { display: block; margin-bottom: 14px; }
+.auth-links .switch-link { color: var(--color-text-muted); }
+
+/* ---------- Splash Screen ---------- */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #fff;
+  transition: opacity 0.4s ease;
+}
+#splash-screen.fade-out { opacity: 0; pointer-events: none; }
+.splash-logo {
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  animation: splash-pop 0.5s ease;
+}
+@keyframes splash-pop {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+.splash-name { font-size: 30px; font-weight: 800; letter-spacing: 0.5px; }
+.splash-tagline { font-size: 13px; opacity: 0.85; margin-top: 6px; }
+.splash-loader {
+  margin-top: 30px;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.splash-dev {
+  position: absolute;
+  bottom: 24px;
+  font-size: 12px;
+  opacity: 0.7;
+}
