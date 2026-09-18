@@ -17,7 +17,7 @@
    ========================================================================== */
 
 const SUPABASE_URL = "https://tyrkajcdusftbufmcmlu.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_Xjd8SZzO2oE6SBf3c1DFyw_cx7v-94X";
+const SUPABASE_ANON_KEY = "sb_publishable_Q_gqo_65CBgQddQ-MXsluQ_iVCH0-aM";
 
 // Batas stok menipis. Ubah angka ini jika kebutuhan bisnis berbeda.
 const LOW_STOCK_THRESHOLD = 5;
