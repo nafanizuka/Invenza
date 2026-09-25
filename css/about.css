@@ -1,0 +1,126 @@
+/* ==========================================================================
+   INVENZA — About page styles
+   ========================================================================== */
+
+.about-hero {
+  background: linear-gradient(135deg, #37A5FF 0%, #5FBBFF 100%);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.about-hero img {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.about-hero h2 { margin: 0 0 4px; font-size: 22px; }
+.about-hero p { margin: 0; opacity: 0.92; font-size: 14px; max-width: 560px; }
+
+.about-section { margin-bottom: 20px; }
+.about-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  margin: 0 0 14px;
+}
+.about-section h3 i { color: var(--color-primary); }
+.about-section p { color: var(--color-text-muted); font-size: 14px; line-height: 1.7; margin: 0 0 10px; }
+
+.feature-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 600px) {
+  .feature-list { grid-template-columns: 1fr; }
+}
+.feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.feature-list i { color: var(--color-primary); font-size: 16px; margin-top: 1px; }
+
+.tech-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(55,165,255,0.25);
+}
+.tech-badge i { font-size: 15px; }
+
+.credits-intro { text-align: center; margin-bottom: 22px; }
+.credits-intro .credits-eyebrow {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.credits-intro .credits-brand {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .credits-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .credits-grid { grid-template-columns: 1fr; }
+}
+.credit-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 12px;
+  text-align: center;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.credit-card:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+.credit-avatar {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+}
+.credit-name { font-size: 13px; font-weight: 600; line-height: 1.4; }

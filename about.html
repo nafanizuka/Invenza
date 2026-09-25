@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>About — Invenza</title>
+  <meta name="theme-color" content="#37A5FF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/about.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        Invenza
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
+        <a href="about.html" class="active"><i class="bi bi-info-circle"></i> About</a>
+        <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
+          <div class="topbar-title">About</div>
+        </div>
+        <div class="topbar-user">
+          <div class="user-avatar" id="navbar-user-avatar">U</div>
+          <span id="navbar-user-name">Pengguna</span>
+        </div>
+      </header>
+
+      <main class="page-body">
+
+        <div class="about-hero">
+          <img src="assets/icons/icon-192.png" alt="Logo Invenza">
+          <div>
+            <h2>Invenza</h2>
+            <p>Sistem inventaris barang berbasis Progressive Web App (PWA), dibuat untuk membantu Anda mencatat dan mengelola stok barang secara digital, cepat, dan aman.</p>
+          </div>
+        </div>
+
+        <div class="card about-section">
+          <div class="card-body">
+            <h3><i class="bi bi-box-seam"></i> Apa itu Invenza?</h3>
+            <p>
+              Invenza membantu Anda mencatat barang, mengelola stok, melihat detail inventaris,
+              mencari barang dengan cepat, dan mengelola seluruh data inventaris secara digital —
+              langsung dari browser, di desktop maupun mobile. Setiap akun memiliki data
+              inventarisnya sendiri yang terpisah dan aman dari akun lain.
+            </p>
+            <ul class="feature-list">
+              <li><i class="bi bi-journal-plus"></i> Mencatat barang baru dengan mudah</li>
+              <li><i class="bi bi-graph-up"></i> Mengelola dan memantau stok</li>
+              <li><i class="bi bi-eye"></i> Melihat detail lengkap tiap barang</li>
+              <li><i class="bi bi-search"></i> Mencari & memfilter barang dengan cepat</li>
+              <li><i class="bi bi-shield-lock"></i> Data terisolasi & aman per akun</li>
+              <li><i class="bi bi-download"></i> Export data kapan saja dibutuhkan</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card about-section">
+          <div class="card-body">
+            <h3><i class="bi bi-cpu"></i> Teknologi yang Digunakan</h3>
+            <div class="tech-badges">
+              <span class="tech-badge"><i class="bi bi-filetype-html"></i> HTML</span>
+              <span class="tech-badge"><i class="bi bi-filetype-css"></i> CSS</span>
+              <span class="tech-badge"><i class="bi bi-filetype-js"></i> JavaScript</span>
+              <span class="tech-badge"><i class="bi bi-bootstrap"></i> Bootstrap Icons</span>
+              <span class="tech-badge"><i class="bi bi-lightning-charge"></i> Supabase</span>
+              <span class="tech-badge"><i class="bi bi-phone"></i> PWA</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card about-section">
+          <div class="card-body">
+            <div class="credits-intro">
+              <div class="credits-eyebrow">Invenza — Inventory Management Application</div>
+              <div class="credits-brand">Developed by NexByte</div>
+            </div>
+            <div class="credits-grid">
+              <div class="credit-card"><div class="credit-avatar">EC</div><div class="credit-name">Eryx Cassablanca Hariadi</div></div>
+              <div class="credit-card"><div class="credit-avatar">GI</div><div class="credit-name">Gusti Izza Ardhiansya Albaí</div></div>
+              <div class="credit-card"><div class="credit-avatar">HN</div><div class="credit-name">Hanaya Nabitha Sani</div></div>
+              <div class="credit-card"><div class="credit-avatar">MY</div><div class="credit-name">Maulidta Yuwanda Fronika</div></div>
+              <div class="credit-card"><div class="credit-avatar">MD</div><div class="credit-name">M. Davin Nur Ardiyanto</div></div>
+              <div class="credit-card"><div class="credit-avatar">MT</div><div class="credit-name">M. Taqiyuddin Al Fatih</div></div>
+              <div class="credit-card"><div class="credit-avatar">NF</div><div class="credit-name">Nafán Falakil Ahyar</div></div>
+              <div class="credit-card"><div class="credit-avatar">NA</div><div class="credit-name">Nikita Ardheka Nezzarita</div></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+      <footer class="app-footer">
+        &copy; 2026 Invenza &middot; Developed by <strong>NexByte</strong>
+      </footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      await requireAuth();
+      await loadCurrentProfile();
+      initUserNavbar();
+    });
+  </script>
+</body>
+</html>

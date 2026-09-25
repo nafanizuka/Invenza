@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Data Barang — Invenza</title>
+  <meta name="theme-color" content="#37A5FF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/products.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        Invenza
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="products.html" class="active"><i class="bi bi-box-seam"></i> Data Barang</a>
+        <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
+          <div class="topbar-title">Data Barang</div>
+        </div>
+        <div class="topbar-user">
+          <div class="user-avatar" id="navbar-user-avatar">U</div>
+          <span id="navbar-user-name">Pengguna</span>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <div class="card">
+          <div class="card-header">
+            <h3>Daftar Barang</h3>
+            <button id="add-product-btn" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tambah Barang</button>
+          </div>
+          <div class="card-body">
+
+            <div class="toolbar">
+              <div class="search-box">
+                <span class="icon"><i class="bi bi-search"></i></span>
+                <input type="text" id="search-input" placeholder="Cari barang (kode, nama, kategori, supplier)...">
+              </div>
+              <select id="filter-category" class="filter-select">
+                <option value="">Semua Kategori</option>
+              </select>
+              <select id="filter-stock" class="filter-select">
+                <option value="">Semua Status Stok</option>
+                <option value="aman">Stok Aman</option>
+                <option value="menipis">Stok Menipis</option>
+                <option value="habis">Stok Habis</option>
+              </select>
+            </div>
+
+            <!-- Desktop table -->
+            <div class="products-table-wrap">
+              <table class="products-table">
+                <thead>
+                  <tr>
+                    <th>Gambar</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th>Kategori</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th>Satuan</th>
+                    <th>Supplier</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body"></tbody>
+              </table>
+              <div id="products-loading" style="text-align:center;padding:30px;color:var(--color-text-muted);">
+                <div class="spinner spinner-dark" style="margin:0 auto 10px;"></div>
+                Memuat data...
+              </div>
+            </div>
+
+            <!-- Mobile cards -->
+            <div class="products-cards" id="products-cards"></div>
+
+            <div id="products-empty" class="empty-state hidden">
+              <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+              <h4>Belum ada data barang</h4>
+              <p>Klik tombol "Tambah Barang" untuk mulai menambahkan inventaris.</p>
+            </div>
+
+          </div>
+        </div>
+      </main>
+      <footer class="app-footer">
+        &copy; 2026 Invenza &middot; Developed by <strong>NexByte</strong>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: Tambah / Edit Barang ============ -->
+  <div id="product-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="product-modal-title">Tambah Barang</h3>
+        <button class="btn-icon" data-close-modal><i class="bi bi-x-lg"></i></button>
+      </div>
+      <form id="product-form" novalidate>
+        <div class="modal-body">
+
+          <div class="form-group" style="text-align:center;">
+            <label>Gambar Barang</label>
+            <img id="image-preview" class="image-preview hidden" alt="Preview gambar barang">
+            <div id="file-input-wrap" class="file-input-wrap">
+              <span><i class="bi bi-camera"></i> Klik untuk pilih gambar</span>
+              <input type="file" id="product-image-input" accept="image/*">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-code">Kode Barang</label>
+              <input type="text" id="product-code" class="form-control" placeholder="BRG001">
+              <div class="form-error" id="error-code"></div>
+            </div>
+            <div class="form-group">
+              <label for="product-name">Nama Barang</label>
+              <input type="text" id="product-name" class="form-control" placeholder="Keyboard Mechanical">
+              <div class="form-error" id="error-name"></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-category">Kategori</label>
+              <input type="text" id="product-category" class="form-control" placeholder="Elektronik" list="category-suggestions">
+              <datalist id="category-suggestions"></datalist>
+              <div class="form-error" id="error-category"></div>
+            </div>
+            <div class="form-group">
+              <label for="product-unit">Satuan</label>
+              <input type="text" id="product-unit" class="form-control" placeholder="Unit">
+              <div class="form-error" id="error-unit"></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-price">Harga</label>
+              <input type="number" id="product-price" class="form-control" placeholder="500000" min="0">
+              <div class="form-error" id="error-price"></div>
+            </div>
+            <div class="form-group">
+              <label for="product-stock">Stok</label>
+              <input type="number" id="product-stock" class="form-control" placeholder="10" min="0">
+              <div class="form-error" id="error-stock"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="product-supplier">Supplier</label>
+            <input type="text" id="product-supplier" class="form-control" placeholder="PT Teknologi Indonesia">
+            <div class="form-error" id="error-supplier"></div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Batal</button>
+          <button type="submit" id="product-submit-btn" class="btn btn-primary">SIMPAN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/products.js"></script>
+  <script>
+    // Jika diarahkan dari detail page dengan ?edit=ID, otomatis buka modal edit
+    document.addEventListener("DOMContentLoaded", () => {
+      const editId = getQueryParam("edit");
+      if (editId) {
+        const check = setInterval(() => {
+          if (allProducts && allProducts.length) {
+            clearInterval(check);
+            openEditModal(editId);
+          }
+        }, 200);
+        setTimeout(() => clearInterval(check), 5000);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* ==========================================================================
+   INVENZA — Dashboard page styles
+   ========================================================================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.stat-icon.blue { background: var(--color-primary-light); color: var(--color-primary); }
+.stat-icon.green { background: var(--color-success-light); color: var(--color-success); }
+.stat-icon.orange { background: var(--color-warning-light); color: var(--color-warning); }
+.stat-icon.red { background: var(--color-danger-light); color: var(--color-danger); }
+.stat-value { font-size: 24px; font-weight: 800; line-height: 1.1; }
+.stat-label { font-size: 13px; color: var(--color-text-muted); margin-top: 2px; }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+.mini-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.mini-table th, .mini-table td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+.mini-table th { color: var(--color-text-muted); font-weight: 600; }
+
+.welcome-banner {
+  background: linear-gradient(135deg, #37A5FF 0%, #5FBBFF 100%);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  margin-bottom: 24px;
+}
+.welcome-banner h2 { margin: 0 0 4px; font-size: 20px; }
+.welcome-banner p { margin: 0; opacity: 0.9; font-size: 14px; }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Invenza — Sistem Inventaris Barang</title>
+  <meta name="description" content="Invenza — Sistem Inventaris Barang sederhana berbasis Supabase.">
+  <meta name="theme-color" content="#37A5FF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+  <!-- ============ SPLASH SCREEN (bukan halaman terpisah, murni HTML/CSS/JS) ============ -->
+  <div id="splash-screen">
+    <img src="assets/icons/icon-192.png" alt="Logo Invenza" class="splash-logo">
+    <div class="splash-name">Invenza</div>
+    <div class="splash-tagline">Sistem Inventaris Barang</div>
+    <div class="splash-loader"></div>
+    <div class="splash-dev">Dikembangkan oleh Tim Invenza</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    // Tampilkan splash minimal beberapa detik, lalu cek session dan redirect.
+    const MIN_SPLASH_MS = 1600;
+    const startTime = Date.now();
+
+    async function routeAfterSplash() {
+      let destination = "login.html";
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        if (data && data.session) {
+          destination = "dashboard.html";
+        }
+      } catch (err) {
+        console.warn("Gagal memeriksa session:", err);
+      }
+
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(MIN_SPLASH_MS - elapsed, 0);
+
+      setTimeout(() => {
+        const splash = document.getElementById("splash-screen");
+        splash.classList.add("fade-out");
+        setTimeout(() => {
+          window.location.replace(destination);
+        }, 400);
+      }, remaining);
+    }
+
+    routeAfterSplash();
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Daftar — Invenza</title>
+  <meta name="theme-color" content="#37A5FF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+  <div class="auth-page">
+    <div class="auth-page-pattern"></div>
+    <div class="auth-card">
+      <div class="auth-brand">
+        <img src="assets/icons/icon-192.png" alt="Logo Invenza">
+        <div class="brand-name">Invenza</div>
+      </div>
+
+      <div class="auth-title">
+        <h1>Buat Akun Baru</h1>
+        <p>Daftar untuk mulai mengelola inventaris.</p>
+      </div>
+
+      <div id="signup-alert" class="auth-alert"></div>
+
+      <form id="signup-form" novalidate>
+        <div class="form-group">
+          <label for="signup-name">Nama Lengkap</label>
+          <input type="text" id="signup-name" class="form-control" placeholder="Nama lengkap" autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" class="form-control" placeholder="Email" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="signup-password" class="form-control" placeholder="Password" autocomplete="new-password" required>
+            <button type="button" class="toggle-password" data-target="signup-password"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-confirm-password">Konfirmasi Password</label>
+          <div class="password-wrap">
+            <input type="password" id="signup-confirm-password" class="form-control" placeholder="Ulangi password" autocomplete="new-password" required>
+            <button type="button" class="toggle-password" data-target="signup-confirm-password"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+
+        <button type="submit" id="signup-submit" class="btn btn-primary btn-block">DAFTAR</button>
+      </form>
+
+      <div class="auth-links">
+        <span class="switch-link">Sudah punya akun? <a href="login.html">Login</a></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>
