@@ -100,6 +100,12 @@ function translateError(err) {
   if (lower.includes("duplicate key")) {
     return "Data yang sama sudah ada.";
   }
+  if (lower.includes("row-level security") || lower.includes("permission denied")) {
+    return "Anda tidak memiliki izin untuk melakukan aksi ini.";
+  }
+  if (lower.includes("violates check constraint") || lower.includes("violates foreign key")) {
+    return "Data yang dimasukkan tidak valid. Silakan periksa kembali.";
+  }
   if (lower.includes("failed to fetch") || lower.includes("networkerror") || lower.includes("network request failed")) {
     return "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
   }
@@ -172,6 +178,64 @@ function buildUniqueFileName(originalName) {
   const base = originalName.replace(/\.[^/.]+$/, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 30);
   const rand = Math.random().toString(36).slice(2, 9);
   return `${base || "produk"}-${Date.now()}-${rand}.${ext}`;
+}
+
+/* ---------- Safe extension helper (never trust the raw filename) ---------- */
+function getSafeImageExtension(file) {
+  const allowed = { "image/jpeg": "jpg", "image/jpg": "jpg", "image/png": "png", "image/webp": "webp" };
+  return allowed[(file && file.type || "").toLowerCase()] || null;
+}
+
+/* ---------- Username validation ---------- */
+function validateUsername(raw) {
+  const value = (raw || "").trim();
+  if (!value) return { valid: false, message: "Username wajib diisi." };
+  if (/\s/.test(value)) return { valid: false, message: "Username tidak boleh mengandung spasi." };
+  if (value.length < USERNAME_MIN_LENGTH || value.length > USERNAME_MAX_LENGTH) {
+    return { valid: false, message: `Username harus ${USERNAME_MIN_LENGTH}-${USERNAME_MAX_LENGTH} karakter.` };
+  }
+  if (!/^[a-zA-Z0-9_.]+$/.test(value)) {
+    return { valid: false, message: "Username hanya boleh berisi huruf, angka, titik, dan garis bawah." };
+  }
+  return { valid: true, value };
+}
+
+/* ---------- Avatar file validation ---------- */
+function validateAvatarFile(file) {
+  if (!file) return { valid: false, message: "Pilih file gambar terlebih dahulu." };
+  const ext = getSafeImageExtension(file);
+  if (!ext) return { valid: false, message: "Format gambar tidak didukung. Gunakan JPG, PNG, atau WebP." };
+  if (file.size > MAX_AVATAR_SIZE_MB * 1024 * 1024) {
+    return { valid: false, message: `Ukuran foto terlalu besar. Maksimal ${MAX_AVATAR_SIZE_MB}MB.` };
+  }
+  return { valid: true, ext };
+}
+
+/* ---------- Auto-generate Kode Barang berdasarkan Kategori ----------
+   PENTING (lihat PRD #7): dipakai bersama oleh form Tambah/Edit Barang
+   (products.js) DAN fitur Import Data (import.js), supaya logikanya
+   tidak duplikat / berbeda-beda di tiap halaman.
+   Contoh: kategori "GPU" -> GPU-001, lalu GPU-002, dst.
+   TIDAK PERNAH menghasilkan "undefined-001", "null-001", atau "-001". */
+function buildCategoryCodePrefix(category) {
+  const cleaned = (category || "")
+    .toString()
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "");
+  return cleaned || "BRG";
+}
+
+function generateProductCode(category, existingCodes) {
+  const prefix = buildCategoryCodePrefix(category);
+  const used = new Set((existingCodes || []).map((c) => (c || "").toString().toUpperCase()));
+  let n = 1;
+  let code;
+  do {
+    code = `${prefix}-${String(n).padStart(3, "0")}`;
+    n += 1;
+  } while (used.has(code));
+  return code;
 }
 
 /* ---------- PWA: Service Worker registration ---------- */

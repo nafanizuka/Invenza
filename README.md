@@ -1,10 +1,92 @@
 # Invenza — Sistem Inventaris Barang
 
+## 0. Changelog — Audit & Perbaikan Terbaru
+
+### Patch terbaru — Gambar via URL (Import) & Penghapusan Export SQL
+- **Import Excel/CSV/JSON kini mendukung kolom Gambar (opsional)**: isi
+  dengan URL gambar publik. URL kosong = tidak apa-apa, URL tidak valid
+  hanya ditandai peringatan di preview (⚠) dan **tidak menggagalkan**
+  proses import barang tersebut — barang tetap masuk tanpa gambar.
+- Nama kolom database untuk gambar **tetap `image_url`** (bukan kolom baru
+  `gambar_url`) — mengikuti konvensi yang sudah dipakai project sejak awal
+  (form Tambah/Edit, halaman Detail, Storage bucket `product-images`),
+  supaya tidak ada kolom ganda/duplikat data. Nilainya boleh berupa URL
+  hasil upload ke Supabase Storage ATAU URL eksternal dari Import.
+- **Export JSON** menyertakan `image_url` (null jika tidak ada gambar).
+- **Export Excel** sekarang menyertakan kolom **Gambar** (URL/path).
+- **Export SQL (PostgreSQL & MySQL) DIHAPUS total** — tombol, card, dan
+  seluruh fungsi JS terkait (`downloadAsSql`, `downloadAsMysql`,
+  `escapeSqlString`) sudah tidak ada.
+- **Backup LocalStorage DIHAPUS** dan sengaja tidak dihidupkan kembali.
+  Halaman Download sekarang hanya berisi **Export JSON** dan **Export
+  Excel**.
+- Form Tambah/Edit Barang, upload/hapus/ganti gambar via file, dan RLS/
+  Storage policy per-user **tidak diubah** (sudah benar sejak sebelumnya).
+
+Ringkasan perubahan pada audit perbaikan menyeluruh terakhir (tidak menghapus
+fitur lama yang sudah benar, hanya memperbaiki & menambah):
+
+- **PWA diperbaiki total**: root cause ditemukan — `icon-512.png` sebelumnya
+  ternyata berukuran 192×192 (salah label), sehingga Chrome/Firefox menolak
+  kriteria "installable" dan hasil install jadi seperti shortcut biasa. Sudah
+  diganti dengan ikon 512×512 asli. Logic install dipindah ke satu file
+  reusable `js/pwa.js` dengan state jelas (installed/installable/manual/
+  unsupported) — tidak pernah mengklaim "browser tidak mendukung" hanya
+  karena `beforeinstallprompt` tidak tersedia.
+- **Tombol Install Invenza dipindah ke sidebar** (tepat di atas Logout), pada
+  SEMUA halaman authenticated. Card "Install PWA" di halaman Profile sudah
+  dihapus (tidak ada duplikat, tidak ada Logout kedua).
+- **Urutan menu sidebar** diubah: Dashboard → Data Barang → About → Import
+  Data → Download Data → Profil Saya, lalu Install Invenza & Logout.
+- **Import Data (baru)**: halaman `import.html` + `js/import.js` — mendukung
+  `.xlsx`, `.xls`, `.csv`, `.json` dengan preview, validasi, deteksi
+  duplikat, dan selalu memakai user yang sedang login (tidak pernah percaya
+  `user_id` dari file yang diupload).
+- **Field barang baru**: Publisher Game (opsional), Kondisi Barang (Bagus /
+  Rusak Ringan / Rusak), Lokasi Barang, Catatan — tersedia di form
+  Tambah/Edit, halaman Detail, Import, dan seluruh format Export. Data lama
+  yang belum mengisi field ini ditampilkan sebagai "-" / "Belum diisi", tidak
+  membuat halaman error.
+- **Kode Barang kini opsional** dan dapat dibuat otomatis berdasarkan
+  kategori (mis. `GPU-001`, `GPU-002`, ...). Kode custom tetap didukung dan
+  divalidasi agar tidak duplikat per akun.
+- **Export data diperjelas**: JSON & SQL (PostgreSQL) & Excel selalu diambil
+  langsung dari Supabase (bukan cache lokal). Ditambah export **SQL (MySQL)**
+  (file statis, tanpa koneksi langsung browser→MySQL) dan **Backup
+  LocalStorage** terpisah yang menyaring keluar token/kredensial apa pun.
+- **Lupa Password diperbaiki**: pesan sekarang netral ("Jika email tersebut
+  terdaftar...") supaya tidak membocorkan status akun, plus validasi format
+  email.
+- **Bug penggantian foto profil diperbaiki**: urutan sekarang upload foto
+  baru → update database → baru hapus foto lama. Sebelumnya kode lama
+  menghapus SEMUA file di folder user duluan sebelum upload (berisiko
+  kehilangan foto jika upload gagal).
+- **Branding "For NexByte Game Store"** ditambahkan di bawah logo pada
+  halaman Login, Sign Up, Reset Password, dan Splash Screen.
+- **Migrasi database**: kolom `publisher`, `kondisi`, `lokasi`, `catatan`
+  ditambahkan ke tabel `products` (lihat `supabase.sql`), aman dijalankan
+  berulang, tidak menghapus data lama.
+- **Responsif mobile (prioritas Android)** ditingkatkan: form otomatis
+  ditumpuk vertikal di layar sempit, padding modal/card disesuaikan, dan
+  tombol Install PWA di sidebar mudah ditekan di layar kecil.
+- RLS, isolasi data per akun, dan Storage policy per-folder yang sudah benar
+  di versi sebelumnya **tidak diubah** (tetap aman).
+
+> ⚠️ **Wajib dilakukan setelah update ini:**
+> 1. Jalankan ulang seluruh isi `supabase.sql` di Supabase SQL Editor (aman,
+>    idempotent) supaya kolom `publisher`/`kondisi`/`lokasi`/`catatan` dibuat.
+> 2. `assets/icons/icon-512.png` untuk sementara di-generate otomatis dari
+>    upscale `icon-192.png` agar memenuhi syarat installability PWA. Untuk
+>    hasil terbaik, ganti file ini dengan ikon asli beresolusi 512×512 kapan
+>    pun Anda punya source logo yang lebih tinggi resolusinya.
+
 ## 1. Nama Proyek
 **Invenza** — Aplikasi Sistem Inventaris Barang berbasis Progressive Web App (PWA).
 
 ## 2. Deskripsi
 Invenza adalah aplikasi web sederhana untuk mengelola data inventaris barang toko. Aplikasi ini dibangun menggunakan **HTML, CSS, dan JavaScript (vanilla)** di sisi frontend, dengan **Supabase** sebagai backend (database, authentication, dan storage). Invenza menerapkan konsep **CRUD (Create, Read, Update, Delete)** secara nyata terhadap data barang yang tersimpan di database PostgreSQL milik Supabase.
+
+**Branding:** Invenza adalah nama aplikasinya — bersifat umum dan dapat dipakai oleh toko/bisnis apa pun. Invenza pada awalnya dikembangkan untuk kebutuhan inventaris **Toko Game NexByte**, dan dikembangkan oleh tim **Nexora**.
 
 ## 3. Tujuan
 Membantu pemilik toko, karyawan, atau administrator inventaris untuk:
@@ -38,6 +120,13 @@ Membantu pemilik toko, karyawan, atau administrator inventaris untuk:
 | Toast Notification | ✅ |
 | Responsive (Desktop, Tablet, Mobile) | ✅ |
 | Progressive Web App (installable) | ✅ |
+| **Halaman Profil Saya** | ✅ |
+| Edit Profile (username) | ✅ |
+| Upload / Ganti / Hapus Foto Profil | ✅ |
+| Ubah Email (via Supabase Auth, dengan verifikasi) | ✅ |
+| Ganti Password (dari halaman Profil) | ✅ |
+| Tombol Install PWA (beforeinstallprompt) | ✅ |
+| Storage Security per-folder user (`product-images`, `profile-images`) | ✅ |
 
 ## 5. Teknologi
 - **Frontend:** HTML5, CSS3, JavaScript (Vanilla, tanpa framework)
@@ -56,7 +145,8 @@ invenza/
 ├── dashboard.html             # Dashboard & statistik
 ├── products.html               # Data barang (list, search, filter, CRUD modal)
 ├── product-detail.html          # Detail satu barang
-├── about.html                    # Tentang aplikasi & credit NexByte
+├── profile.html                  # Profil Saya: edit profile, foto, email, password, install PWA
+├── about.html                    # Tentang aplikasi & credit tim Nexora
 ├── download.html                  # Export data (JSON, SQL, Excel)
 │
 ├── manifest.json               # Konfigurasi PWA
@@ -72,20 +162,22 @@ invenza/
 │   ├── auth.css                 # Style login/signup/reset/splash
 │   ├── dashboard.css             # Style dashboard
 │   ├── products.css              # Style data barang & detail
+│   ├── profile.css                # Style halaman Profil Saya
 │   ├── about.css                 # Style halaman About
 │   └── download.css              # Style halaman Download Data
 │
 └── js/
     ├── config.js                 # Kredensial Supabase (WAJIB DIISI)
     ├── supabase.js                # Inisialisasi client Supabase
-    ├── utils.js                   # Fungsi bantuan (toast, format, validasi, dsb.)
-    ├── auth.js                     # requireAuth(), getCurrentUserId(), logout, session listener
+    ├── utils.js                   # Fungsi bantuan (toast, format, validasi, PWA install, dsb.)
+    ├── auth.js                     # requireAuth(), getCurrentUserId(), profil navbar, logout
     ├── login.js                    # Logika halaman login
     ├── signup.js                    # Logika halaman daftar
     ├── reset-password.js             # Logika lupa/reset password
     ├── dashboard.js                   # Logika statistik dashboard (per akun)
     ├── products.js                     # Logika CRUD data barang (per akun)
     ├── product-detail.js                # Logika halaman detail barang (per akun)
+    ├── profile.js                        # Edit profile, foto, email, password, install PWA
     └── download.js                       # Export data JSON/SQL/Excel (per akun)
 ```
 

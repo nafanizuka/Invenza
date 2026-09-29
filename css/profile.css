@@ -1,0 +1,83 @@
+/* ==========================================================================
+   INVENZA — Profile page styles
+   ========================================================================== */
+
+.profile-hero {
+  background: linear-gradient(135deg, #37A5FF 0%, #5FBBFF 100%);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.profile-hero-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.profile-hero-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-hero h2 { margin: 0 0 4px; font-size: 21px; }
+.profile-hero p { margin: 0; opacity: 0.92; font-size: 14px; }
+.profile-hero-actions { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  max-width: 640px;
+}
+
+.info-list { display: flex; flex-direction: column; gap: 14px; }
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.info-row i { color: var(--color-primary); font-size: 17px; margin-top: 2px; }
+.info-row-label { font-size: 12.5px; color: var(--color-text-muted); margin-bottom: 2px; }
+.info-row-value { font-size: 14px; font-weight: 600; word-break: break-word; }
+
+/* ---------- Avatar picker inside Edit Profile modal ---------- */
+.avatar-picker { text-align: center; margin-bottom: 6px; }
+.avatar-picker-preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.avatar-picker-preview img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-picker-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .profile-hero { text-align: center; justify-content: center; }
+  .profile-hero-actions { margin-left: 0; width: 100%; justify-content: center; }
+}

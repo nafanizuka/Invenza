@@ -24,3 +24,12 @@ const LOW_STOCK_THRESHOLD = 5;
 
 // Nama bucket Supabase Storage untuk gambar produk.
 const PRODUCT_IMAGE_BUCKET = "product-images";
+
+// Nama bucket Supabase Storage untuk foto profil pengguna.
+const PROFILE_IMAGE_BUCKET = "profile-images";
+
+// Batas panjang username & ukuran foto profil (harus konsisten dengan
+// constraint di supabase.sql).
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 30;
+const MAX_AVATAR_SIZE_MB = 2;

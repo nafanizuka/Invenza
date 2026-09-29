@@ -1,8 +1,13 @@
 /* ==========================================================================
    INVENZA — Download Data Page Logic
-   Export data inventaris milik user yang sedang login saja (JSON, SQL, Excel).
+   Export data inventaris milik user yang sedang login saja (JSON, Excel).
    PENTING: Tidak pernah melakukan export seluruh database — setiap query
    selalu difilter dengan user_id milik akun yang sedang login.
+
+   Catatan (PRD patch — hapus Export SQL): fitur Export SQL (PostgreSQL),
+   Export SQL (MySQL), dan Backup LocalStorage sengaja DIHAPUS dan TIDAK
+   BOLEH dihidupkan kembali. Hanya Export JSON dan Export Excel yang
+   disediakan di halaman ini.
    ========================================================================== */
 
 let myProducts = [];
@@ -15,7 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadMyProductsForExport();
 
   document.getElementById("download-json-btn").addEventListener("click", downloadAsJson);
-  document.getElementById("download-sql-btn").addEventListener("click", downloadAsSql);
   document.getElementById("download-excel-btn").addEventListener("click", downloadAsExcel);
 });
 
@@ -64,11 +68,6 @@ function triggerFileDownload(content, fileName, mimeType) {
   URL.revokeObjectURL(url);
 }
 
-function escapeSqlString(value) {
-  if (value === null || value === undefined) return "NULL";
-  return "'" + String(value).replace(/'/g, "''") + "'";
-}
-
 /* ---------- JSON Export ---------- */
 
 function downloadAsJson() {
@@ -84,42 +83,17 @@ function downloadAsJson() {
     stock: p.stock,
     unit: p.unit,
     supplier: p.supplier,
-    image_url: p.image_url,
+    publisher: p.publisher || null,
+    kondisi: p.kondisi || null,
+    lokasi: p.lokasi || null,
+    catatan: p.catatan || null,
+    image_url: p.image_url || null,
     created_at: p.created_at,
     updated_at: p.updated_at,
   }));
   const json = JSON.stringify(exportData, null, 2);
   triggerFileDownload(json, `invenza-data-${todayStamp()}.json`, "application/json");
   showToast("File JSON berhasil diunduh");
-}
-
-/* ---------- SQL Export ---------- */
-
-function downloadAsSql() {
-  if (!myProducts.length) {
-    showToast("Belum ada data untuk di-export.", "error");
-    return;
-  }
-  const lines = [
-    "-- Invenza — Export Data Barang",
-    `-- Diunduh pada: ${new Date().toISOString()}`,
-    "-- Catatan: hanya berisi barang milik akun yang sedang login.",
-    "",
-  ];
-
-  myProducts.forEach((p) => {
-    lines.push(
-      `INSERT INTO products (code, name, category, price, stock, unit, supplier) VALUES (${escapeSqlString(
-        p.code
-      )}, ${escapeSqlString(p.name)}, ${escapeSqlString(p.category)}, ${Number(p.price) || 0}, ${
-        Number(p.stock) || 0
-      }, ${escapeSqlString(p.unit)}, ${escapeSqlString(p.supplier)});`
-    );
-  });
-
-  const sql = lines.join("\n");
-  triggerFileDownload(sql, `invenza-data-${todayStamp()}.sql`, "application/sql");
-  showToast("File SQL berhasil diunduh");
 }
 
 /* ---------- Excel Export ---------- */
@@ -143,6 +117,11 @@ function downloadAsExcel() {
     Stok: Number(p.stock) || 0,
     Satuan: p.unit,
     Supplier: p.supplier,
+    "Publisher Game": p.publisher || "",
+    Kondisi: p.kondisi || "",
+    "Lokasi Barang": p.lokasi || "",
+    Catatan: p.catatan || "",
+    Gambar: p.image_url || "",
     "Tanggal Dibuat": formatDate(p.created_at),
     "Tanggal Diubah": formatDate(p.updated_at),
   }));

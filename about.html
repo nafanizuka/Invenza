@@ -25,9 +25,15 @@
         <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
         <a href="about.html" class="active"><i class="bi bi-info-circle"></i> About</a>
+        <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
         <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
       </nav>
       <div class="sidebar-footer">
+        <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
+          <i class="bi bi-download pwa-icon"></i>
+          <span class="pwa-label">Install Invenza</span>
+        </button>
         <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
       </div>
     </aside>
@@ -37,10 +43,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
           <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
           <div class="topbar-title">About</div>
-        </div>
-        <div class="topbar-user">
+        </div><div class="topbar-right">
+          <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
+            <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
+          </button>
+          <a href="profile.html" class="topbar-user" title="Profil Saya">
           <div class="user-avatar" id="navbar-user-avatar">U</div>
           <span id="navbar-user-name">Pengguna</span>
+        </a>
         </div>
       </header>
 
@@ -50,7 +60,7 @@
           <img src="assets/icons/icon-192.png" alt="Logo Invenza">
           <div>
             <h2>Invenza</h2>
-            <p>Sistem inventaris barang berbasis Progressive Web App (PWA), dibuat untuk membantu Anda mencatat dan mengelola stok barang secara digital, cepat, dan aman.</p>
+            <p>Invenza adalah aplikasi manajemen inventaris yang membantu toko dan bisnis dalam mencatat, mengelola, dan memantau barang secara lebih terorganisir.</p>
           </div>
         </div>
 
@@ -63,6 +73,13 @@
               langsung dari browser, di desktop maupun mobile. Setiap akun memiliki data
               inventarisnya sendiri yang terpisah dan aman dari akun lain.
             </p>
+            <p>
+              Invenza pada awalnya dikembangkan untuk mendukung kebutuhan inventaris
+              <strong>Toko Game NexByte</strong>. Namun, Invenza tidak terbatas hanya untuk NexByte —
+              aplikasi ini terbuka dan dapat digunakan oleh toko atau bisnis lain yang membutuhkan
+              sistem manajemen inventaris, seperti toko retail, toko elektronik, toko komputer,
+              maupun bisnis kecil dan menengah lainnya.
+            </p>
             <ul class="feature-list">
               <li><i class="bi bi-journal-plus"></i> Mencatat barang baru dengan mudah</li>
               <li><i class="bi bi-graph-up"></i> Mengelola dan memantau stok</li>
@@ -70,6 +87,8 @@
               <li><i class="bi bi-search"></i> Mencari & memfilter barang dengan cepat</li>
               <li><i class="bi bi-shield-lock"></i> Data terisolasi & aman per akun</li>
               <li><i class="bi bi-download"></i> Export data kapan saja dibutuhkan</li>
+              <li><i class="bi bi-person-circle"></i> Kelola profil, username & foto akun</li>
+              <li><i class="bi bi-phone"></i> Install sebagai aplikasi (PWA)</li>
             </ul>
           </div>
         </div>
@@ -92,24 +111,28 @@
           <div class="card-body">
             <div class="credits-intro">
               <div class="credits-eyebrow">Invenza — Inventory Management Application</div>
-              <div class="credits-brand">Developed by NexByte</div>
+              <div class="credits-brand">Developed by Nexora</div>
+              <p style="max-width:520px;margin:10px auto 0;color:var(--color-text-muted);font-size:13.5px;line-height:1.6;">
+                Nexora Development Team &middot; awalnya dikembangkan untuk Toko Game NexByte,
+                kini terbuka untuk digunakan toko/bisnis lain.
+              </p>
             </div>
             <div class="credits-grid">
-              <div class="credit-card"><div class="credit-avatar">EC</div><div class="credit-name">Eryx Cassablanca Hariadi</div></div>
-              <div class="credit-card"><div class="credit-avatar">GI</div><div class="credit-name">Gusti Izza Ardhiansya Albaí</div></div>
-              <div class="credit-card"><div class="credit-avatar">HN</div><div class="credit-name">Hanaya Nabitha Sani</div></div>
-              <div class="credit-card"><div class="credit-avatar">MY</div><div class="credit-name">Maulidta Yuwanda Fronika</div></div>
-              <div class="credit-card"><div class="credit-avatar">MD</div><div class="credit-name">M. Davin Nur Ardiyanto</div></div>
-              <div class="credit-card"><div class="credit-avatar">MT</div><div class="credit-name">M. Taqiyuddin Al Fatih</div></div>
-              <div class="credit-card"><div class="credit-avatar">NF</div><div class="credit-name">Nafán Falakil Ahyar</div></div>
-              <div class="credit-card"><div class="credit-avatar">NA</div><div class="credit-name">Nikita Ardheka Nezzarita</div></div>
+              <div class="credit-card"><div class="credit-name">Eryx Cassablanca Hariadi</div></div>
+              <div class="credit-card"><div class="credit-name">Gusti Izza Ardhiansya Albai</div></div>
+              <div class="credit-card"><div class="credit-name">Hanaya Nabitha Sani</div></div>
+              <div class="credit-card"><div class="credit-name">Maulidta Yuwanda Fronika</div></div>
+              <div class="credit-card"><div class="credit-name">M. Davin Nur Ardiyanto</div></div>
+              <div class="credit-card"><div class="credit-name">M. Taqiyuddin Al Fatih</div></div>
+              <div class="credit-card"><div class="credit-name">Naf'an Falakil Ahyar</div></div>
+              <div class="credit-card"><div class="credit-name">Nikita Ardheka Nezzarita</div></div>
             </div>
           </div>
         </div>
 
       </main>
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>NexByte</strong>
+        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
       </footer>
     </div>
   </div>
@@ -119,6 +142,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       await requireAuth();

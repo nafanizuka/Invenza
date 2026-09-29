@@ -25,9 +25,15 @@
         <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
         <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
         <a href="download.html" class="active"><i class="bi bi-download"></i> Download Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
       </nav>
       <div class="sidebar-footer">
+        <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
+          <i class="bi bi-download pwa-icon"></i>
+          <span class="pwa-label">Install Invenza</span>
+        </button>
         <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
       </div>
     </aside>
@@ -37,10 +43,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
           <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
           <div class="topbar-title">Download Data</div>
-        </div>
-        <div class="topbar-user">
+        </div><div class="topbar-right">
+          <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
+            <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
+          </button>
+          <a href="profile.html" class="topbar-user" title="Profil Saya">
           <div class="user-avatar" id="navbar-user-avatar">U</div>
           <span id="navbar-user-name">Pengguna</span>
+        </a>
         </div>
       </header>
 
@@ -48,29 +58,23 @@
         <div class="card">
           <div class="card-body">
             <p class="download-intro">
-              Download data inventaris kamu dalam berbagai format. Data yang diunduh
-              hanya berisi barang milik akun yang sedang login.
+              Download data inventaris kamu dalam format JSON atau Excel. Data yang diunduh
+              hanya berisi barang milik akun yang sedang login, diambil langsung dari
+              database (Supabase) terbaru — bukan dari cache lokal browser.
             </p>
 
             <div class="download-grid">
               <div class="download-card">
                 <div class="download-icon"><i class="bi bi-filetype-json"></i></div>
-                <h4>JSON</h4>
-                <p>Data terstruktur, cocok untuk dipakai kembali di aplikasi atau script lain.</p>
+                <h4>JSON (Database)</h4>
+                <p>Data terbaru dari Supabase, cocok untuk dipakai kembali di aplikasi atau script lain.</p>
                 <button id="download-json-btn" class="btn btn-primary"><i class="bi bi-download"></i> Download JSON</button>
-              </div>
-
-              <div class="download-card">
-                <div class="download-icon"><i class="bi bi-database"></i></div>
-                <h4>SQL</h4>
-                <p>Database dump berisi perintah INSERT untuk seluruh barang milik Anda.</p>
-                <button id="download-sql-btn" class="btn btn-primary"><i class="bi bi-download"></i> Download SQL</button>
               </div>
 
               <div class="download-card">
                 <div class="download-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
                 <h4>Excel</h4>
-                <p>Spreadsheet .xlsx siap dibuka di Excel, Google Sheets, atau aplikasi sejenis.</p>
+                <p>Spreadsheet .xlsx siap dibuka di Excel, Google Sheets, atau aplikasi sejenis. Termasuk kolom Gambar (URL).</p>
                 <button id="download-excel-btn" class="btn btn-primary"><i class="bi bi-download"></i> Download Excel</button>
               </div>
             </div>
@@ -83,7 +87,7 @@
         </div>
       </main>
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>NexByte</strong>
+        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
       </footer>
     </div>
   </div>
@@ -94,6 +98,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
   <script src="js/download.js"></script>
 </body>
 </html>

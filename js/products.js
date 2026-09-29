@@ -135,12 +135,13 @@ function renderProductCard(p) {
   const img = p.image_url
     ? `<img src="${escapeHtml(p.image_url)}" class="product-thumb" alt="${escapeHtml(p.name)}">`
     : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);"><i class="bi bi-box-seam"></i></div>`;
+  const kondisi = p.kondisi || "-";
   return `
     <div class="product-card" data-detail-id="${p.id}">
       ${img}
       <div class="product-card-body">
         <div class="product-card-title">${escapeHtml(p.name)}</div>
-        <div class="product-card-sub">${escapeHtml(p.code)} · ${escapeHtml(p.category)}</div>
+        <div class="product-card-sub">${escapeHtml(p.code)} · ${escapeHtml(p.category)} · ${escapeHtml(kondisi)}</div>
         <div class="product-card-meta">
           <span class="product-card-price">${formatRupiah(p.price)}</span>
           <span class="badge ${status.cls}">${status.label}</span>
@@ -171,7 +172,9 @@ function bindToolbarEvents() {
     const filtered = allProducts.filter((p) => {
       const matchesQuery =
         !query ||
-        [p.code, p.name, p.category, p.supplier].some((f) => (f || "").toLowerCase().includes(query));
+        [p.code, p.name, p.category, p.supplier, p.publisher, p.lokasi].some((f) =>
+          (f || "").toLowerCase().includes(query)
+        );
       const matchesCategory = !category || p.category === category;
       const matchesStock = !stockStatus || getStockStatus(p.stock).key === stockStatus;
       return matchesQuery && matchesCategory && matchesStock;
@@ -222,6 +225,30 @@ function bindModalEvents() {
   });
 
   form.addEventListener("submit", handleProductFormSubmit);
+
+  // Helper text live untuk auto-generate Kode Barang (lihat PRD #7)
+  document.getElementById("product-category").addEventListener("input", updateCodeHelper);
+  document.getElementById("product-code").addEventListener("input", updateCodeHelper);
+}
+
+function updateCodeHelper() {
+  const codeHelper = document.getElementById("code-helper-text");
+  if (!codeHelper) return;
+
+  if (editingProductId) {
+    codeHelper.textContent = "Kosongkan untuk mempertahankan kode barang saat ini.";
+    return;
+  }
+  const category = document.getElementById("product-category").value.trim();
+  const manualCode = document.getElementById("product-code").value.trim();
+  if (manualCode) {
+    codeHelper.textContent = "Menggunakan kode custom yang Anda masukkan.";
+  } else if (!category) {
+    codeHelper.textContent = "Silakan pilih kategori terlebih dahulu agar kode barang dapat dibuat otomatis.";
+  } else {
+    const preview = generateProductCode(category, allProducts.map((p) => p.code));
+    codeHelper.textContent = `Kode otomatis: ${preview}`;
+  }
 }
 
 function openAddModal() {
@@ -229,8 +256,10 @@ function openAddModal() {
   selectedImageFile = null;
   document.getElementById("product-modal-title").textContent = "Tambah Barang";
   document.getElementById("product-form").reset();
+  document.getElementById("product-kondisi").value = "Bagus";
   document.getElementById("image-preview").classList.add("hidden");
   clearFormErrors();
+  updateCodeHelper();
   document.getElementById("product-modal").classList.remove("hidden");
 }
 
@@ -250,6 +279,10 @@ function openEditModal(id) {
   document.getElementById("product-stock").value = product.stock || "";
   document.getElementById("product-unit").value = product.unit || "";
   document.getElementById("product-supplier").value = product.supplier || "";
+  document.getElementById("product-publisher").value = product.publisher || "";
+  document.getElementById("product-kondisi").value = product.kondisi || "Bagus";
+  document.getElementById("product-lokasi").value = product.lokasi || "";
+  document.getElementById("product-catatan").value = product.catatan || "";
 
   const preview = document.getElementById("image-preview");
   if (product.image_url) {
@@ -259,6 +292,7 @@ function openEditModal(id) {
     preview.classList.add("hidden");
   }
 
+  updateCodeHelper();
   document.getElementById("product-modal").classList.remove("hidden");
 }
 
@@ -280,7 +314,9 @@ function clearFormErrors() {
 
 function validateProductForm(values) {
   const errors = {};
-  if (!values.code) errors.code = "Kode wajib diisi.";
+  // Kode Barang bersifat OPSIONAL (lihat PRD #7) — jika kosong akan
+  // dibuatkan otomatis berdasarkan kategori saat submit, jadi TIDAK
+  // divalidasi sebagai wajib diisi di sini.
   if (!values.name) errors.name = "Nama barang wajib diisi.";
   if (!values.category) errors.category = "Kategori wajib diisi.";
 
@@ -324,8 +360,12 @@ async function isDuplicateCode(code, excludeId) {
   return data && data.length > 0;
 }
 
-async function uploadProductImage(file) {
-  const fileName = buildUniqueFileName(file.name);
+async function uploadProductImage(file, userId) {
+  // Path WAJIB diawali "<user_id>/" agar sesuai dengan Storage RLS policy
+  // (lihat supabase.sql): setiap akun hanya boleh menulis ke folder miliknya
+  // sendiri. Nama file dibuat sendiri oleh sistem (buildUniqueFileName),
+  // TIDAK pernah mempercayai nama file asli dari browser.
+  const fileName = `${userId}/${buildUniqueFileName(file.name)}`;
   const { error: uploadError } = await supabaseClient.storage
     .from(PRODUCT_IMAGE_BUCKET)
     .upload(fileName, file, { cacheControl: "3600", upsert: false });
@@ -359,6 +399,10 @@ async function handleProductFormSubmit(e) {
     stock: document.getElementById("product-stock").value,
     unit: document.getElementById("product-unit").value.trim(),
     supplier: document.getElementById("product-supplier").value.trim(),
+    publisher: document.getElementById("product-publisher").value.trim(),
+    kondisi: document.getElementById("product-kondisi").value,
+    lokasi: document.getElementById("product-lokasi").value.trim(),
+    catatan: document.getElementById("product-catatan").value.trim(),
   };
 
   const errors = validateProductForm(values);
@@ -376,8 +420,19 @@ async function handleProductFormSubmit(e) {
     const userId = await getCurrentUserId();
     if (!userId) return;
 
+    // ---- Kode Barang: pakai input manual jika diisi, kalau tidak buat
+    //      otomatis berdasarkan kategori (lihat PRD #7). TIDAK PERNAH
+    //      menghasilkan kode kosong / "undefined-001" / "null-001". ----
+    let finalCode = values.code;
+    if (!finalCode) {
+      const existingCodes = allProducts
+        .filter((p) => String(p.id) !== String(editingProductId))
+        .map((p) => p.code);
+      finalCode = generateProductCode(values.category, existingCodes);
+    }
+
     // Cek duplikasi kode barang (hanya dalam lingkup data milik user ini)
-    const duplicate = await isDuplicateCode(values.code, editingProductId);
+    const duplicate = await isDuplicateCode(finalCode, editingProductId);
     if (duplicate) {
       showFormErrors({ code: "Kode barang sudah digunakan." });
       setButtonLoading(submitBtn, false);
@@ -395,18 +450,22 @@ async function handleProductFormSubmit(e) {
 
     if (selectedImageFile) {
       setButtonLoading(submitBtn, true, "Mengupload gambar...");
-      const uploaded = await uploadProductImage(selectedImageFile);
+      const uploaded = await uploadProductImage(selectedImageFile, userId);
       imageUrl = uploaded.url;
     }
 
     const payload = {
-      code: values.code,
+      code: finalCode,
       name: values.name,
       category: values.category,
       price: Number(values.price),
       stock: Number(values.stock),
       unit: values.unit,
       supplier: values.supplier,
+      publisher: values.publisher || null,
+      kondisi: values.kondisi || "Bagus",
+      lokasi: values.lokasi || null,
+      catatan: values.catatan || null,
       image_url: imageUrl,
       updated_at: new Date().toISOString(),
     };

@@ -1,7 +1,10 @@
 {
+  "id": "/index.html",
   "name": "Invenza - Sistem Inventaris Barang",
   "short_name": "Invenza",
   "description": "Aplikasi Sistem Inventaris Barang untuk membantu pemilik dan karyawan toko mengelola data barang.",
+  "lang": "id",
+  "dir": "ltr",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

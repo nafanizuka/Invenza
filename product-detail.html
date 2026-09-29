@@ -25,9 +25,15 @@
         <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="products.html" class="active"><i class="bi bi-box-seam"></i> Data Barang</a>
         <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
         <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
       </nav>
       <div class="sidebar-footer">
+        <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
+          <i class="bi bi-download pwa-icon"></i>
+          <span class="pwa-label">Install Invenza</span>
+        </button>
         <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
       </div>
     </aside>
@@ -37,10 +43,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
           <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
           <div class="topbar-title">Detail Barang</div>
-        </div>
-        <div class="topbar-user">
+        </div><div class="topbar-right">
+          <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
+            <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
+          </button>
+          <a href="profile.html" class="topbar-user" title="Profil Saya">
           <div class="user-avatar" id="navbar-user-avatar">U</div>
           <span id="navbar-user-name">Pengguna</span>
+        </a>
         </div>
       </header>
 
@@ -88,6 +98,23 @@
                     <div class="label">Supplier</div>
                     <div class="value" id="detail-supplier">-</div>
                   </div>
+                  <div class="detail-info-item">
+                    <div class="label">Publisher Game</div>
+                    <div class="value" id="detail-publisher">-</div>
+                  </div>
+                  <div class="detail-info-item">
+                    <div class="label">Kondisi</div>
+                    <div class="value" id="detail-kondisi">-</div>
+                  </div>
+                  <div class="detail-info-item">
+                    <div class="label">Lokasi Barang</div>
+                    <div class="value" id="detail-lokasi">-</div>
+                  </div>
+                </div>
+
+                <div class="detail-info-item" style="margin-top:14px;">
+                  <div class="label">Catatan</div>
+                  <div class="value" id="detail-catatan">-</div>
                 </div>
 
                 <div class="detail-actions">
@@ -105,7 +132,7 @@
         </div>
       </main>
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>NexByte</strong>
+        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
       </footer>
     </div>
   </div>
@@ -115,6 +142,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
   <script src="js/product-detail.js"></script>
 </body>
 </html>

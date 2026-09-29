@@ -105,22 +105,9 @@
   background: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 16px 12px;
+  padding: 18px 12px;
   text-align: center;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 .credit-card:hover { border-color: var(--color-primary); transform: translateY(-2px); }
-.credit-avatar {
-  width: 46px;
-  height: 46px;
-  margin: 0 auto 10px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 15px;
-}
 .credit-name { font-size: 13px; font-weight: 600; line-height: 1.4; }

@@ -79,6 +79,25 @@
   font-weight: 800;
   color: var(--color-primary);
 }
+.auth-brand .brand-sub {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.2px;
+}
+.splash-store-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 420px) {
+  .auth-card { padding: 30px 22px; }
+}
 
 .auth-title { text-align: center; margin-bottom: 26px; }
 .auth-title h1 { font-size: 20px; margin: 0 0 6px; }

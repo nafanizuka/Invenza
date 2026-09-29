@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Import Data — Invenza</title>
+  <meta name="theme-color" content="#37A5FF">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/import.css">
+</head>
+<body>
+
+  <div class="app-shell">
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/icons/icon-192.png" alt="Invenza" style="width:30px;height:30px;border-radius:8px;">
+        Invenza
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="products.html"><i class="bi bi-box-seam"></i> Data Barang</a>
+        <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="import.html" class="active"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
+        <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
+          <i class="bi bi-download pwa-icon"></i>
+          <span class="pwa-label">Install Invenza</span>
+        </button>
+        <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
+          <div class="topbar-title">Import Data</div>
+        </div><div class="topbar-right">
+          <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
+            <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
+          </button>
+          <a href="profile.html" class="topbar-user" title="Profil Saya">
+          <div class="user-avatar" id="navbar-user-avatar">U</div>
+          <span id="navbar-user-name">Pengguna</span>
+        </a>
+        </div>
+      </header>
+
+      <main class="page-body">
+        <div class="card">
+          <div class="card-header">
+            <h3>Import Data Barang</h3>
+          </div>
+          <div class="card-body">
+            <p class="download-intro">
+              Import data barang dari file Excel (.xlsx/.xls), CSV (.csv), atau JSON (.json).
+              Semua data yang berhasil diimport akan otomatis tersimpan ke akun Anda yang sedang
+              login — data pada file (termasuk kolom <code>user_id</code> jika ada) tidak pernah
+              digunakan untuk menentukan pemilik data; pemilik selalu ditentukan dari sesi login
+              Anda saat ini.
+            </p>
+
+            <div class="import-format-box">
+              <h4><i class="bi bi-info-circle"></i> Format Kolom File Import</h4>
+              <p>Gunakan nama kolom berikut pada baris pertama file Excel/CSV Anda:</p>
+              <div class="import-format-scroll">
+                <code class="import-format-cols">Kode | Nama Barang | Kategori | Harga | Stok | Satuan | Supplier | Publisher | Kondisi | Lokasi | Catatan | Gambar</code>
+              </div>
+              <ul class="import-format-list">
+                <li><strong>Nama Barang</strong> dan <strong>Kategori</strong> wajib diisi.</li>
+                <li>Kolom lainnya boleh dikosongkan jika tidak diperlukan.</li>
+                <li>Jika <strong>Kode</strong> dikosongkan, kode barang dibuat otomatis berdasarkan Kategori.</li>
+                <li>Nilai <strong>Kondisi</strong> yang valid: <code>Bagus</code>, <code>Rusak Ringan</code>, <code>Rusak</code>.</li>
+                <li><strong>Gambar</strong> opsional, isi dengan URL gambar (mis. <code>https://...</code>). Boleh dikosongkan; jika URL tidak valid, barang tetap diimport tanpa gambar.</li>
+                <li>Untuk file <strong>JSON</strong>, gunakan nama properti <code>image_url</code> atau <code>gambar_url</code>.</li>
+              </ul>
+              <details class="import-format-example">
+                <summary>Lihat contoh baris data</summary>
+                <div class="import-format-scroll">
+                  <code>GPU-001 | RTX 3060 | GPU | 4500000 | 5 | Unit | ASUS | NVIDIA | Bagus | Rak A1 | Barang baru | https://example.com/rtx3060.jpg</code>
+                </div>
+              </details>
+            </div>
+
+            <div class="import-dropzone" id="import-drop-wrap">
+              <i class="bi bi-cloud-arrow-up"></i>
+              <div><strong>Klik untuk pilih file</strong></div>
+              <div class="import-dropzone-hint">Format didukung: .xlsx, .xls, .csv, .json</div>
+              <div class="import-dropzone-filename" id="import-filename"></div>
+              <input type="file" id="import-file-input" accept=".xlsx,.xls,.csv,.json" class="hidden">
+            </div>
+
+            <div id="import-error-box" class="form-error" style="margin-top:10px;"></div>
+
+            <div id="import-preview-section" class="hidden" style="margin-top:24px;">
+              <h4 style="margin:0 0 4px;">Preview Data (<span id="import-preview-count">0</span> baris)</h4>
+              <p class="import-preview-note">
+                Baris dengan tanda <span class="badge badge-danger">Error</span> akan dilewati saat import.
+                Baris tanpa Kode Barang akan dibuatkan kode otomatis berdasarkan kategori.
+              </p>
+              <div class="import-preview-wrap">
+                <table class="products-table" id="import-preview-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Kode</th>
+                      <th>Nama</th>
+                      <th>Kategori</th>
+                      <th>Harga</th>
+                      <th>Stok</th>
+                      <th>Kondisi</th>
+                      <th>Gambar</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="import-preview-body"></tbody>
+                </table>
+              </div>
+              <div class="import-actions">
+                <button id="import-confirm-btn" class="btn btn-primary"><i class="bi bi-upload"></i> Import Sekarang</button>
+                <button id="import-cancel-btn" class="btn btn-secondary" type="button">Batal</button>
+              </div>
+            </div>
+
+            <div id="import-result-section" class="hidden" style="margin-top:24px;">
+              <h4 style="margin:0 0 12px;">Hasil Import</h4>
+              <div class="import-result-grid">
+                <div class="import-result-chip success">
+                  <div class="import-result-value" id="result-success">0</div>
+                  <div class="import-result-label">Berhasil diimport</div>
+                </div>
+                <div class="import-result-chip warning">
+                  <div class="import-result-value" id="result-skipped">0</div>
+                  <div class="import-result-label">Dilewati (duplikat)</div>
+                </div>
+                <div class="import-result-chip danger">
+                  <div class="import-result-value" id="result-failed">0</div>
+                  <div class="import-result-label">Error</div>
+                </div>
+              </div>
+              <a href="products.html" class="btn btn-primary" style="margin-top:16px;display:inline-flex;">Lihat Data Barang</a>
+            </div>
+
+          </div>
+        </div>
+      </main>
+      <footer class="app-footer">
+        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
+      </footer>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
+  <script src="js/import.js"></script>
+</body>
+</html>

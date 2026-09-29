@@ -1,0 +1,133 @@
+/* ==========================================================================
+   INVENZA — Import Data page styles
+   ========================================================================== */
+
+/* ---------- Format Kolom (petunjuk) ---------- */
+.import-format-box {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: 16px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+.import-format-box h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text);
+}
+.import-format-box p { margin: 0 0 8px; font-size: 13px; color: var(--color-text-muted); }
+.import-format-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.import-format-scroll code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  white-space: pre;
+  font-size: 12.5px;
+  color: var(--color-primary);
+}
+.import-format-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+.import-format-example { margin-top: 10px; font-size: 12.5px; }
+.import-format-example summary { cursor: pointer; color: var(--color-primary); font-weight: 600; }
+.import-format-example .import-format-scroll { margin-top: 8px; }
+.import-format-example code { color: var(--color-text-muted); }
+
+/* ---------- Dropzone / halaman: jangan pernah melebihi viewport ---------- */
+.import-page,
+.card-body,
+.import-preview-section,
+.import-format-box,
+.import-dropzone {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.import-dropzone {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  color: var(--color-text-muted);
+}
+.import-dropzone:hover { border-color: var(--color-primary); }
+.import-dropzone i { font-size: 32px; color: var(--color-primary); margin-bottom: 8px; display: block; }
+.import-dropzone-hint { font-size: 12.5px; margin-top: 4px; }
+.import-dropzone-filename { margin-top: 10px; font-weight: 600; color: var(--color-text); word-break: break-all; }
+
+.import-preview-note { font-size: 12.5px; color: var(--color-text-muted); margin: 0 0 12px; }
+
+/* ---------- Tabel preview: HALAMAN tidak boleh melebar, tabel yang di-scroll ---------- */
+.import-preview-wrap {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  max-height: 420px;
+}
+#import-preview-table {
+  width: 100%;
+  min-width: 820px; /* hanya berlaku di dalam wrapper yang bisa di-scroll */
+  border-collapse: collapse;
+}
+
+.import-image-status { font-size: 12.5px; white-space: nowrap; }
+.import-image-status.none { color: var(--color-text-muted); }
+.import-image-status.ok { color: var(--color-success); }
+.import-image-status.warn { color: var(--color-warning); }
+
+.import-actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+.import-actions .btn { flex: 1; min-width: 140px; min-height: 44px; }
+@media (max-width: 600px) {
+  .import-actions { flex-direction: column; width: 100%; }
+  .import-actions .btn { width: 100%; min-width: 0; }
+}
+
+.import-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 560px) {
+  .import-result-grid { grid-template-columns: 1fr; }
+}
+.import-result-chip {
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+.import-result-chip.success { background: var(--color-success-light); }
+.import-result-chip.warning { background: var(--color-warning-light); }
+.import-result-chip.danger { background: var(--color-danger-light); }
+.import-result-value { font-size: 26px; font-weight: 800; }
+.import-result-chip.success .import-result-value { color: var(--color-success); }
+.import-result-chip.warning .import-result-value { color: var(--color-warning); }
+.import-result-chip.danger .import-result-value { color: var(--color-danger); }
+.import-result-label { font-size: 12.5px; color: var(--color-text-muted); margin-top: 4px; }

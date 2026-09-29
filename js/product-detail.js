@@ -84,6 +84,12 @@ function renderDetail(p) {
   document.getElementById("detail-price").textContent = formatRupiah(p.price);
   document.getElementById("detail-stock").textContent = `${p.stock} ${p.unit || ""}`;
   document.getElementById("detail-supplier").textContent = p.supplier || "-";
+  // Field baru (publisher/kondisi/lokasi/catatan): data lama mungkin belum
+  // mempunyai kolom ini terisi — jangan pernah crash, tampilkan fallback.
+  document.getElementById("detail-publisher").textContent = p.publisher || "-";
+  document.getElementById("detail-kondisi").textContent = p.kondisi || "Belum diisi";
+  document.getElementById("detail-lokasi").textContent = p.lokasi || "-";
+  document.getElementById("detail-catatan").textContent = p.catatan || "-";
 
   document.getElementById("detail-created").textContent = formatDate(p.created_at);
   document.getElementById("detail-updated").textContent = formatDate(p.updated_at);

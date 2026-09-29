@@ -25,9 +25,15 @@
         <a href="dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
         <a href="products.html" class="active"><i class="bi bi-box-seam"></i> Data Barang</a>
         <a href="about.html"><i class="bi bi-info-circle"></i> About</a>
+        <a href="import.html"><i class="bi bi-cloud-arrow-up"></i> Import Data</a>
         <a href="download.html"><i class="bi bi-download"></i> Download Data</a>
+        <a href="profile.html"><i class="bi bi-person-circle"></i> Profil Saya</a>
       </nav>
       <div class="sidebar-footer">
+        <button id="install-pwa-nav-btn" data-pwa-install="sidebar" class="btn btn-secondary btn-block sidebar-pwa-btn" type="button">
+          <i class="bi bi-download pwa-icon"></i>
+          <span class="pwa-label">Install Invenza</span>
+        </button>
         <button id="logout-btn" class="btn btn-secondary btn-block"><i class="bi bi-box-arrow-right"></i> Logout</button>
       </div>
     </aside>
@@ -37,10 +43,14 @@
         <div style="display:flex;align-items:center;gap:12px;">
           <button id="menu-toggle" class="menu-toggle"><i class="bi bi-list"></i></button>
           <div class="topbar-title">Data Barang</div>
-        </div>
-        <div class="topbar-user">
+        </div><div class="topbar-right">
+          <button id="install-pwa-topbar-btn" data-pwa-install="topbar" class="btn btn-primary topbar-install-btn" type="button" aria-label="Install Invenza">
+            <i class="bi bi-download pwa-icon"></i><span class="pwa-label">Install</span>
+          </button>
+          <a href="profile.html" class="topbar-user" title="Profil Saya">
           <div class="user-avatar" id="navbar-user-avatar">U</div>
           <span id="navbar-user-name">Pengguna</span>
+        </a>
         </div>
       </header>
 
@@ -105,7 +115,7 @@
         </div>
       </main>
       <footer class="app-footer">
-        &copy; 2026 Invenza &middot; Developed by <strong>NexByte</strong>
+        &copy; 2026 Invenza &middot; Developed by <strong>Nexora</strong>
       </footer>
     </div>
   </div>
@@ -131,9 +141,10 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="product-code">Kode Barang</label>
-              <input type="text" id="product-code" class="form-control" placeholder="BRG001">
-              <div class="form-error" id="error-code"></div>
+              <label for="product-category">Kategori</label>
+              <input type="text" id="product-category" class="form-control" placeholder="Elektronik" list="category-suggestions">
+              <datalist id="category-suggestions"></datalist>
+              <div class="form-error" id="error-category"></div>
             </div>
             <div class="form-group">
               <label for="product-name">Nama Barang</label>
@@ -142,18 +153,11 @@
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="product-category">Kategori</label>
-              <input type="text" id="product-category" class="form-control" placeholder="Elektronik" list="category-suggestions">
-              <datalist id="category-suggestions"></datalist>
-              <div class="form-error" id="error-category"></div>
-            </div>
-            <div class="form-group">
-              <label for="product-unit">Satuan</label>
-              <input type="text" id="product-unit" class="form-control" placeholder="Unit">
-              <div class="form-error" id="error-unit"></div>
-            </div>
+          <div class="form-group">
+            <label for="product-code">Kode Barang <span style="font-weight:400;color:var(--color-text-muted);">(opsional)</span></label>
+            <input type="text" id="product-code" class="form-control" placeholder="Kosongkan untuk membuat otomatis">
+            <div class="form-hint" id="code-helper-text">Pilih kategori terlebih dahulu agar kode barang dapat dibuat otomatis.</div>
+            <div class="form-error" id="error-code"></div>
           </div>
 
           <div class="form-row">
@@ -169,10 +173,43 @@
             </div>
           </div>
 
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-unit">Satuan</label>
+              <input type="text" id="product-unit" class="form-control" placeholder="Unit">
+              <div class="form-error" id="error-unit"></div>
+            </div>
+            <div class="form-group">
+              <label for="product-supplier">Supplier</label>
+              <input type="text" id="product-supplier" class="form-control" placeholder="PT Teknologi Indonesia">
+              <div class="form-error" id="error-supplier"></div>
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="product-supplier">Supplier</label>
-            <input type="text" id="product-supplier" class="form-control" placeholder="PT Teknologi Indonesia">
-            <div class="form-error" id="error-supplier"></div>
+            <label for="product-publisher">Publisher Game <span style="font-weight:400;color:var(--color-text-muted);">(opsional)</span></label>
+            <input type="text" id="product-publisher" class="form-control" placeholder="Rockstar Games">
+            <div class="form-hint">Opsional — dapat dikosongkan untuk barang non-game.</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="product-kondisi">Kondisi Barang</label>
+              <select id="product-kondisi" class="form-control">
+                <option value="Bagus">Bagus</option>
+                <option value="Rusak Ringan">Rusak Ringan</option>
+                <option value="Rusak">Rusak</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="product-lokasi">Lokasi Barang <span style="font-weight:400;color:var(--color-text-muted);">(opsional)</span></label>
+              <input type="text" id="product-lokasi" class="form-control" placeholder="Rak A-01 / Gudang / Etalase">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="product-catatan">Catatan <span style="font-weight:400;color:var(--color-text-muted);">(opsional)</span></label>
+            <textarea id="product-catatan" class="form-control" rows="3" placeholder="Kelengkapan lengkap, kondisi masih baik."></textarea>
           </div>
 
         </div>
@@ -189,6 +226,7 @@
   <script src="js/supabase.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/pwa.js"></script>
   <script src="js/products.js"></script>
   <script>
     // Jika diarahkan dari detail page dengan ?edit=ID, otomatis buka modal edit

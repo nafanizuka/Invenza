@@ -6,7 +6,7 @@
    di sini karena bersifat dinamis/real-time.
    ========================================================================== */
 
-const CACHE_NAME = "invenza-cache-v2";
+const CACHE_NAME = "invenza-cache-v6";
 
 const APP_SHELL = [
   "./index.html",
@@ -16,26 +16,33 @@ const APP_SHELL = [
   "./dashboard.html",
   "./products.html",
   "./product-detail.html",
+  "./profile.html",
   "./about.html",
   "./download.html",
+  "./import.html",
   "./manifest.json",
   "./css/style.css",
   "./css/auth.css",
   "./css/dashboard.css",
   "./css/products.css",
+  "./css/profile.css",
   "./css/about.css",
   "./css/download.css",
+  "./css/import.css",
   "./js/config.js",
   "./js/supabase.js",
   "./js/utils.js",
   "./js/auth.js",
+  "./js/pwa.js",
   "./js/login.js",
   "./js/signup.js",
   "./js/reset-password.js",
   "./js/dashboard.js",
   "./js/products.js",
   "./js/product-detail.js",
+  "./js/profile.js",
   "./js/download.js",
+  "./js/import.js",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/favicon.png",
@@ -70,25 +77,25 @@ self.addEventListener("fetch", (event) => {
   const url = event.request.url;
 
   if (url.includes("supabase.co") || url.includes("supabase.in")) {
-    // Jangan intercept permintaan ke Supabase; biarkan selalu ke network.
+    // Jangan intercept permintaan ke Supabase (data & auth selalu ke network,
+    // tidak pernah di-cache -> data user A tidak bisa bocor ke user B).
     return;
   }
 
   if (event.request.method !== "GET") return;
+  if (!url.startsWith(self.location.origin)) return; // CDN dll: biarkan browser
 
+  // NETWORK-FIRST untuk file app shell: pembaruan (mis. tombol Install baru)
+  // langsung terlihat saat online; cache hanya jadi cadangan saat offline.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request)
-        .then((response) => {
-          // Simpan salinan ke cache untuk permintaan same-origin
-          if (response && response.status === 200 && event.request.url.startsWith(self.location.origin)) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-    })
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

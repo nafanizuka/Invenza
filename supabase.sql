@@ -30,6 +30,29 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+-- ---- MIGRATION: kolom untuk fitur Edit Profile (username & foto profil) ----
+-- Aman dijalankan berulang kali / pada database existing: hanya menambah
+-- kolom baru, tidak menghapus data yang sudah ada.
+alter table public.profiles add column if not exists username text;
+alter table public.profiles add column if not exists avatar_url text;
+
+-- Validasi panjang username (3-30 karakter, tanpa spasi di awal/akhir).
+-- Dibuat NULLABLE agar akun lama yang belum mengisi username tidak error;
+-- aplikasi frontend menampilkan fallback (full_name/email) jika masih kosong.
+alter table public.profiles drop constraint if exists profiles_username_length_check;
+alter table public.profiles add constraint profiles_username_length_check
+  check (
+    username is null
+    or (char_length(btrim(username)) between 3 and 30 and username = btrim(username))
+  );
+
+-- Username unik per aplikasi (case-insensitive), tapi hanya berlaku untuk
+-- baris yang sudah mengisi username (partial unique index).
+drop index if exists idx_profiles_username_unique;
+create unique index if not exists idx_profiles_username_unique
+  on public.profiles (lower(username))
+  where username is not null;
+
 -- ----------------------------------------------------------------------------
 -- 3. TABEL: products (Data Barang)
 -- ----------------------------------------------------------------------------
@@ -42,6 +65,10 @@ create table if not exists public.products (
   stock integer not null default 0 check (stock >= 0),
   unit text not null,
   supplier text not null,
+  -- image_url: referensi gambar barang (OPSIONAL, nullable, tanpa default).
+  -- Bisa berisi URL publik hasil upload ke Supabase Storage (bucket
+  -- product-images) ATAU URL eksternal yang dimasukkan lewat Import
+  -- Excel/CSV/JSON. Tidak pernah menyimpan file gambar/base64 di kolom ini.
   image_url text,
   user_id uuid references auth.users (id) on delete cascade,
   created_at timestamptz not null default now(),
@@ -78,6 +105,23 @@ create index if not exists idx_products_category on public.products (category);
 create index if not exists idx_products_name on public.products using gin (to_tsvector('simple', name));
 create index if not exists idx_products_user_id on public.products (user_id);
 
+-- ---- MIGRATION: field tambahan untuk Data Barang (lihat PRD) ----
+-- publisher  : Publisher Game, OPSIONAL (barang non-game boleh dikosongkan)
+-- kondisi    : Bagus / Rusak Ringan / Rusak
+-- lokasi     : lokasi fisik barang (Rak/Gudang/Etalase), opsional
+-- catatan    : catatan bebas, opsional
+-- Aman dijalankan berulang / pada data lama: kolom baru selalu NULLABLE
+-- supaya baris lama yang belum mengisi field ini tidak error. Frontend
+-- menampilkan fallback ("-" / "Belum diisi") untuk nilai NULL.
+alter table public.products add column if not exists publisher text;
+alter table public.products add column if not exists kondisi text;
+alter table public.products add column if not exists lokasi text;
+alter table public.products add column if not exists catatan text;
+
+alter table public.products drop constraint if exists products_kondisi_check;
+alter table public.products add constraint products_kondisi_check
+  check (kondisi is null or kondisi in ('Bagus', 'Rusak Ringan', 'Rusak'));
+
 -- ----------------------------------------------------------------------------
 -- 4. TRIGGER: Auto-membuat baris profiles saat ada user baru mendaftar
 -- ----------------------------------------------------------------------------
@@ -87,12 +131,34 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  base_username text;
+  candidate_username text;
+  suffix int := 0;
 begin
-  insert into public.profiles (id, full_name, email)
+  -- Buat username default dari bagian sebelum "@" pada email, dibersihkan
+  -- dari karakter yang tidak diizinkan. Pengguna bisa menggantinya kapan
+  -- saja lewat halaman Edit Profile.
+  base_username := lower(regexp_replace(coalesce(split_part(new.email, '@', 1), ''), '[^a-z0-9_.]', '', 'g'));
+  if base_username is null or length(base_username) < 3 then
+    base_username := 'user' || substr(replace(new.id::text, '-', ''), 1, 6);
+  end if;
+
+  candidate_username := base_username;
+  loop
+    exit when not exists (
+      select 1 from public.profiles where lower(username) = lower(candidate_username)
+    );
+    suffix := suffix + 1;
+    candidate_username := base_username || suffix::text;
+  end loop;
+
+  insert into public.profiles (id, full_name, email, username)
   values (
     new.id,
     coalesce(new.raw_user_meta_data ->> 'full_name', new.email),
-    new.email
+    new.email,
+    candidate_username
   )
   on conflict (id) do nothing;
   return new;
@@ -148,7 +214,17 @@ create policy "profiles_select_own"
 drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own"
   on public.profiles for update
-  using (auth.uid() = id);
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
+
+-- Pengguna hanya dapat membuat baris profil miliknya sendiri (id = auth.uid()).
+-- Biasanya baris ini sudah otomatis dibuat oleh trigger on_auth_user_created,
+-- policy ini hanya jaring pengaman jika ada fallback insert dari frontend.
+drop policy if exists "profiles_insert_own" on public.profiles;
+create policy "profiles_insert_own"
+  on public.profiles for insert
+  to authenticated
+  with check (auth.uid() = id);
 
 -- ---- Policy: products ----
 -- Setiap akun HANYA dapat membaca, menambah, mengubah, dan menghapus
@@ -184,39 +260,90 @@ create policy "products_delete_own"
   using (auth.uid() = user_id);
 
 -- ----------------------------------------------------------------------------
--- 7. SUPABASE STORAGE — bucket "product-images"
+-- 7. SUPABASE STORAGE — bucket "product-images" & "profile-images"
 --    NOTE: Membuat bucket lebih mudah lewat Dashboard (Storage -> New Bucket),
 --    tapi juga bisa dijalankan lewat SQL berikut.
+--
+--    PERBAIKAN KEAMANAN (lihat PRD): policy versi lama mengizinkan SEMUA
+--    pengguna yang login untuk upload/update/delete FILE APA PUN di bucket,
+--    termasuk milik akun lain. Sekarang setiap file WAJIB disimpan di dalam
+--    folder ber-nama user_id miliknya sendiri:
+--      product-images/<user_id>/nama-file.jpg
+--      profile-images/<user_id>/avatar.jpg
+--    dan policy memeriksa bahwa folder pertama pada path (storage.foldername)
+--    sama dengan auth.uid() milik pengguna yang sedang login.
 -- ----------------------------------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('product-images', 'product-images', true)
 on conflict (id) do nothing;
 
--- Policy storage: siapa saja boleh MELIHAT gambar (karena bucket public,
--- supaya <img> tag bisa menampilkan gambar tanpa perlu login), tetapi
--- hanya pengguna yang LOGIN yang boleh upload/update/hapus gambar.
+insert into storage.buckets (id, name, public)
+values ('profile-images', 'profile-images', true)
+on conflict (id) do nothing;
+
+-- ---- Bucket: product-images ----
+-- Siapa saja boleh MELIHAT gambar (bucket public, supaya <img> tag bisa
+-- menampilkan gambar tanpa perlu login), tetapi upload/update/delete HANYA
+-- boleh dilakukan oleh pemilik folder (user_id) yang bersangkutan.
 drop policy if exists "product_images_public_read" on storage.objects;
 create policy "product_images_public_read"
   on storage.objects for select
   using (bucket_id = 'product-images');
 
 drop policy if exists "product_images_auth_insert" on storage.objects;
-create policy "product_images_auth_insert"
+drop policy if exists "product_images_owner_insert" on storage.objects;
+create policy "product_images_owner_insert"
   on storage.objects for insert
   to authenticated
-  with check (bucket_id = 'product-images');
+  with check (
+    bucket_id = 'product-images'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
 
 drop policy if exists "product_images_auth_update" on storage.objects;
-create policy "product_images_auth_update"
+drop policy if exists "product_images_owner_update" on storage.objects;
+create policy "product_images_owner_update"
   on storage.objects for update
   to authenticated
-  using (bucket_id = 'product-images');
+  using (bucket_id = 'product-images' and (storage.foldername(name))[1] = auth.uid()::text)
+  with check (bucket_id = 'product-images' and (storage.foldername(name))[1] = auth.uid()::text);
 
 drop policy if exists "product_images_auth_delete" on storage.objects;
-create policy "product_images_auth_delete"
+drop policy if exists "product_images_owner_delete" on storage.objects;
+create policy "product_images_owner_delete"
   on storage.objects for delete
   to authenticated
-  using (bucket_id = 'product-images');
+  using (bucket_id = 'product-images' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- ---- Bucket: profile-images ----
+-- Sama seperti product-images: baca bersifat publik (agar avatar tampil di
+-- <img>), tapi tulis/ubah/hapus hanya boleh oleh pemilik folder user_id-nya.
+drop policy if exists "profile_images_public_read" on storage.objects;
+create policy "profile_images_public_read"
+  on storage.objects for select
+  using (bucket_id = 'profile-images');
+
+drop policy if exists "profile_images_owner_insert" on storage.objects;
+create policy "profile_images_owner_insert"
+  on storage.objects for insert
+  to authenticated
+  with check (
+    bucket_id = 'profile-images'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+drop policy if exists "profile_images_owner_update" on storage.objects;
+create policy "profile_images_owner_update"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'profile-images' and (storage.foldername(name))[1] = auth.uid()::text)
+  with check (bucket_id = 'profile-images' and (storage.foldername(name))[1] = auth.uid()::text);
+
+drop policy if exists "profile_images_owner_delete" on storage.objects;
+create policy "profile_images_owner_delete"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'profile-images' and (storage.foldername(name))[1] = auth.uid()::text);
 
 -- ----------------------------------------------------------------------------
 -- 8. DATA DUMMY (opsional, untuk testing & demonstrasi CRUD)
@@ -240,7 +367,15 @@ create policy "product_images_auth_delete"
 --    akan terlihat oleh siapa pun karena RLS, jadi isi manual jika perlu).
 -- 2. Buka Authentication -> Policies -> pastikan policy "*_own" di atas aktif
 --    dan policy lama ("*_authenticated") sudah terhapus.
--- 3. Buka Storage untuk memastikan bucket "product-images" sudah ada.
+-- 3. Buka Storage untuk memastikan bucket "product-images" DAN "profile-images"
+--    sudah ada, dan policy-nya adalah versi "*_owner_*" (folder per user_id),
+--    BUKAN lagi versi lama "*_auth_*" yang mengizinkan akses global.
 -- 4. Buka Authentication -> Providers -> pastikan Email provider aktif.
 -- 5. Uji isolasi data dengan minimal 2 akun berbeda (lihat README.md).
+-- 6. Kolom "profiles.username" & "profiles.avatar_url" baru: akun lama akan
+--    memiliki username hasil generate otomatis hanya untuk pengguna yang
+--    mendaftar SETELAH migration ini dijalankan. Untuk akun yang sudah ada
+--    sebelumnya, kolom bisa NULL — aplikasi frontend sudah menangani fallback
+--    ini (menampilkan full_name/email), dan pengguna dapat mengisi username
+--    kapan saja lewat halaman Edit Profile.
 -- ============================================================================
